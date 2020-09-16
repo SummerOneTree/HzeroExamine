@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="hzero-todo-provider-item" />
+        <module name="hzero-order-export-pdf" />
+        <module name="hzero-order" />
+        <module name="hzero-todo-service" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="hzero-starter-sso-oauth" target="1.8" />
+      <module name="hzero-todo-service-item" target="1.8" />
+      <module name="hzero-todo-service-provider-item" target="1.8" />
+    </bytecodeTargetLevel>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="hzero-order" options="-parameters" />
+      <module name="hzero-order-export-pdf" options="-parameters" />
+      <module name="hzero-starter-sso-oauth" options="-parameters" />
+      <module name="hzero-todo-provider-item" options="-parameters" />
+      <module name="hzero-todo-service" options="-parameters" />
+      <module name="hzero-todo-service-provider-item" options="-parameters" />
+    </option>
+  </component>
+</project>

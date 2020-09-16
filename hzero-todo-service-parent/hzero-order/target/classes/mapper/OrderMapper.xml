@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.hzero.todo.infra.mapper.OrderMapper">
+    <resultMap id="orderResultMap" type="org.hzero.todo.domain.entity.Order">
+        <result property="totalPrice" column="total_price" />
+        <association property="soHeader" javaType="org.hzero.todo.domain.entity.SoHeader">
+            <id property="soHeaderId" column="so_header_id" />
+            <result property="orderNumber" column="order_number" />
+            <result property="companyId" column="company_id" />
+            <result property="orderDate" column="order_date" />
+            <result property="orderStatus" column="order_status" />
+            <result property="customerId" column="customer_id" />
+        </association>
+        <association property="company" javaType="org.hzero.todo.domain.entity.Company">
+            <id property="companyId" column="company_id" />
+            <result property="companyNumber" column="company_number" />
+            <result property="companyName" column="company_name" />
+            <result property="enabledFlag" column="enabled_flag" />
+        </association>
+        <association property="customer" javaType="org.hzero.todo.domain.entity.Customer">
+            <id property="customerId" column="customer_id" />
+            <result property="customerNumber" column="customer_number" />
+            <result property="customerName" column="customer_name" />
+            <result property="companyId" column="company_id" />
+            <result property="enabledFlag" column="enabled_flag" />
+        </association>
+        <association property="soLine" javaType="org.hzero.todo.domain.entity.SoLine">
+            <id property="soLineId" column="so_line_id" />
+            <result property="soHeaderId" column="so_header_id" />
+            <result property="lineNumber" column="line_number" />
+            <result property="itemId" column="item_id" />
+            <result property="orderQuantity" column="order_quantity" />
+            <result property="orderQuantityUom" column="order_quantity_uom" />
+            <result property="unitSellingPrice" column="unit_selling_price" />
+            <result property="description" column="description" />
+            <result property="addition1" column="addition1" />
+            <result property="addition2" column="addition2" />
+            <result property="addition3" column="addition3" />
+            <result property="addition4" column="addition4" />
+            <result property="addition5" column="addition5" />
+        </association>
+        <association property="item" javaType="org.hzero.todo.domain.entity.Item">
+            <id property="itemId" column="item_id" />
+            <result property="itemCode" column="item_code" />
+            <result property="itemUom" column="item_uom" />
+            <result property="itemDescription" column="item_description" />
+            <result property="saleableFlag" column="saleable_flag" />
+            <result property="startActiveDate" column="start_active_date" />
+            <result property="endActiveDate" column="end_active_date" />
+            <result property="enabledFlag" column="enabled_flag" />
+        </association>
+    </resultMap>
+    <select id="getOrderList" resultMap="orderResultMap">
+        select hsh.order_number,
+            hco.company_name,
+            hcu.customer_name,
+            hsh.order_date,
+            hsh.order_status,
+			round(sum(hsl.order_quantity*hsl.unit_selling_price),2) as total_price
+        from hodr_so_header hsh
+        left join hodr_company hco on hsh.company_id = hco.company_id
+        left join hodr_customer hcu on hsh.customer_id = hcu.customer_id
+        left join hodr_so_line hsl on hsh.so_header_id = hsl.so_header_id
+		group by hsh.so_header_id
+    </select>
+    <select id="getExportOrderList" resultMap="orderResultMap">
+        select hsh.order_number,
+            hco.company_number,
+            hsh.order_date,
+            hsh.order_status,
+            hcu.customer_number,
+            hsl.line_number,
+            hi.item_code,
+            hsl.order_quantity,
+            hsl.order_quantity_uom,
+            hsl.unit_selling_price,
+            hsl.description,
+            hsl.addition1,
+            hsl.addition2,
+            hsl.addition3,
+            hsl.addition4,
+            hsl.addition5
+        from hodr_so_header hsh
+        join hodr_company hco on hsh.company_id = hco.company_id
+        join hodr_customer hcu on hsh.customer_id = hcu.customer_id
+        join hodr_so_line hsl on hsh.so_header_id = hsl.so_header_id
+        join hodr_item hi on hsl.item_id = hi.item_id
+    </select>
+    <select id="getDetailList" resultMap="orderResultMap" parameterType="String">
+        select hsh.order_number,
+            hsl.line_number,
+            hi.item_code,
+            hi.item_description,
+            hi.item_uom,
+            hsl.order_quantity,
+            hsl.unit_selling_price,
+            hsl.description,
+            hsl.addition1,
+            hsl.addition2,
+            hsl.addition3,
+            hsl.addition4,
+            hsl.addition5,
+            round((hsl.order_quantity * hsl.unit_selling_price),2) as total_price
+        from hodr_so_line hsl
+        join hodr_item hi on hsl.item_id = hi.item_id
+        join hodr_so_header hsh on hsh.so_header_id = hsl.so_header_id
+        <where>
+            <if test="order_number != null and order_number != ''">
+                and order_number = #{orderNumber}
+            </if>
+        </where>
+    </select>
+    <select id="getOrderBySelect" resultMap="orderResultMap">
+        select hsh.order_number,
+        hco.company_name,
+        hcu.customer_name,
+        hsh.order_date,
+        hsh.order_status,
+        round(sum(hsl.order_quantity*hsl.unit_selling_price),2) as total_price
+        from hodr_so_header hsh
+        left join hodr_company hco on hsh.company_id = hco.company_id
+        left join hodr_customer hcu on hsh.customer_id = hcu.customer_id
+        left join hodr_so_line hsl on hsh.so_header_id = hsl.so_header_id
+        left join hodr_item hi on hsl.item_id = hi.item_id
+        <where>
+            <if test="companyId != null and companyId !=''">
+                and hco.company_id = #{companyId}
+            </if>
+            <if test="customerId != null and customerId !=''">
+                and hcu.customer_id = #{customerId}
+            </if>
+            <if test="orderNumber != null and orderNumber !=''">
+                and order_number like concat('%', #{orderNumber}, '%')
+            </if>
+            <if test="orderStatus != null and orderStatus !=''">
+                and order_status = #{orderStatus}
+            </if>
+            <if test="itemCode != null and itemCode !=''">
+                and item_code like concat('%', #{itemCode}, '%')
+            </if>
+        </where>
+        group by hsh.so_header_id
+    </select>
+</mapper>

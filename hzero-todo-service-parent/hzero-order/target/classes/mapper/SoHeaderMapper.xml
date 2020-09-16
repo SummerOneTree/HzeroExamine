@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.hzero.todo.infra.mapper.SoHeaderMapper">
+    <update id="updateSoHeader" parameterType="org.hzero.todo.domain.entity.SoHeader">
+        update hodr_so_header
+        set order_status = #{orderStatus},
+        object_version_number = object_version_number + 1
+        where so_header_id = #{soHeaderId}
+        and object_version_number = #{objectVersionNumber}
+    </update>
+</mapper>
